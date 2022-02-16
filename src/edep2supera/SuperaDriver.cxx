@@ -2,7 +2,14 @@
 
 #include "SuperaDriver.h"
 #include <iostream>
-void SuperaDriver::speak() const
-{
-	std::cout << "hello world" << std::endl;
+
+namespace supera { 
+
+
+	void SuperaDriver::ReadEvent(const TG4Event* ev)
+	{
+		std::cout<<ev<<std::endl;
+		supera::ParticleGroup pg();
+	}
+
 }
