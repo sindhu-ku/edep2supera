@@ -2,14 +2,16 @@
 
 #include "EDepSim/TG4Event.h"
 #include "supera/base/SuperaData.h"
+#include "supera/base/SuperaEvent.h"
 
-namespace supera {
+namespace supera
+{
 
-	class SuperaDriver {
+	class SuperaDriver
+	{
 	public:
 		SuperaDriver() : val(0) {}
 
-		void ReadEvent(const TG4Event* ev);
-
+		EventInput ReadEvent(const TG4Event *ev);
 	};
 }
