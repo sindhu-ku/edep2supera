@@ -23,8 +23,6 @@ namespace edep2supera {
 
 			result.push_back(part_input);
 		}
-
-
 	}
 
 	supera::Particle SuperaDriver::TG4TrajectoryToParticle(const TG4Trajectory& edepsim_part)
@@ -74,8 +72,8 @@ namespace edep2supera {
 
 		if(pdg_code == 22) {
 			return supera::kPhoton;
-		}else if(pdg_code == 11) {
-			std::cout << "PDG 11 G4ProcessType " << g4type_main 
+		}else if(std::abs(pdg_code) == 11) {
+			std::cout << "PDG " << pdg_code << " G4ProcessType " << g4type_main 
 			<< " SubProcessType " << g4type_sub
 			<< std::endl;
 			/*
