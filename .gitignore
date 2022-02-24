@@ -1,6 +1,6 @@
 dist
 _skbuild
-edep2supera.egg-info
+*edep2supera.egg-info
 *.out
 *.depend
 *.png
