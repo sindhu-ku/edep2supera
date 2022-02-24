@@ -15,9 +15,6 @@ ROOT_GENERATE_DICTIONARY(G__edep2supera
 # Build the library.
 add_library(edep2supera SHARED ${SOURCES} G__edep2supera.cxx)
 
-# Add a shared library
-#add_library(${name} SHARED ${SOURCES})
-
 # Link libraries
 target_link_libraries(edep2supera
     ${PYTHON_LIBRARIES}
@@ -26,6 +23,7 @@ target_link_libraries(edep2supera
     -L${SUPERA_LIB_DIR} -lsupera
 )
 
+# Install
 install(TARGETS edep2supera
     LIBRARY DESTINATION ${CMAKE_PACKAGE_DIR}/lib
     ARCHIVE DESTINATION ${CMAKE_PACKAGE_DIR}/lib
