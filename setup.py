@@ -30,7 +30,6 @@ setup(
     install_requires=[
         'numpy',
         'scikit-build',
-        'larcv',
         'supera',
     ],
     long_description=long_description,
