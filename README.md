@@ -29,12 +29,20 @@ pytest
 at the top-level directory. 
 
 ## How to contribute
+
 1. Fork this repository to your personal github account.
 2. Clone the repository to your local machine. Follow the build/install instruction above and make sure you can set up.
 3. Create your branch to contain your own development.  Code code code.
 4. When it's ready to be shared, make sure a unit test passes. Then request to merge by sending a pull request.
 
 **Optional but strongly recommended**: implement a unit test for the added component of your code so that we can reduce chance of someone else breaking in future development.
+
+## Communication for development
+* Feel free to use github issues! We try to be attentive as much as possible.
+* Join our weekly ND Technical Software Meeting (noon PST every Wednesday, here's [indico category](https://indico.slac.stanford.edu/category/23/)).
+* Join our mailing list dunend-simreco-technical@listserv.slac.stanford.edu
+  - Send an email to listserv@listserv.slac.stanford.edu with an empty title. The body should include this text: `SUBSCRIBE DUNEND-SIMRECO-TECHNICAL FIRST LAST` where you should replace the `FIRST` and `LAST` with your first and last names respectively.
+* Join our slack channel (contact [Kazu](mailto:kterao@slac.stanford.edu)).
 
 ## Status
 
