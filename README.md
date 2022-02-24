@@ -20,6 +20,14 @@ Executable scripts are in Python and C++ classes and functions are bound to Pyth
 ```
 > python3 setup.py install --user
 ```
+
+## Software validation (unit test)
+Simply try:
+```
+pytest
+```
+at the top-level directory. 
+
 ## How to contribute
 1. Fork this repository to your personal github account.
 2. Clone the repository to your local machine. Follow the build/install instruction above and make sure you can set up.
