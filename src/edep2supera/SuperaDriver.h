@@ -12,7 +12,8 @@ namespace edep2supera {
 		SuperaDriver() {}
 
 		void ReadEvent(const TG4Event* ev);
-
+		supera::Particle TG4TrajectoryToParticle(const TG4Trajectory& edepsim_part);
+		supera::ProcessType InferProcessType(const TG4Trajectory& edepsim_part);
 	};
 }
 #endif
