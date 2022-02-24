@@ -1,17 +1,18 @@
-
+#ifndef __SUPERADRIVER_H__
+#define __SUPERADRIVER_H__
 
 #include "EDepSim/TG4Event.h"
-#include "supera/base/SuperaData.h"
-#include "supera/base/SuperaEvent.h"
+#include "supera/data/Particle.h"
 
-namespace supera
-{
+namespace edep2supera {
 
 	class SuperaDriver
 	{
 	public:
-		SuperaDriver() : val(0) {}
+		SuperaDriver() {}
 
-		EventInput ReadEvent(const TG4Event *ev);
+		void ReadEvent(const TG4Event* ev);
+
 	};
 }
+#endif
