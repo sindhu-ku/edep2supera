@@ -34,6 +34,8 @@ at the top-level directory.
 3. Create your branch to contain your own development.  Code code code.
 4. When it's ready to be shared, make sure a unit test passes. Then request to merge by sending a pull request.
 
+**Optional but strongly recommended**: implement a unit test for the added component of your code so that we can reduce chance of someone else breaking in future development.
+
 ## Status
 
 Milestones
