@@ -9,20 +9,27 @@ namespace edep2supera {
 	void SuperaDriver::ReadEvent(const TG4Event *ev) // returns a supera.Event to be used in SuperaAtomic
 	{
 		supera::EventInput result;
-
-		//std::cout << ev << std::endl;
+		result.reserve(ev->Trajectories.size());
 
 		for (auto const &traj : ev->Trajectories)
 		{
 			supera::ParticleInput part_input;
-
 			part_input.valid   = true;
 			part_input.part    = this->TG4TrajectoryToParticle(traj);
 			part_input.part.id = result.size();
-			part_input.type    = this->InferProcessType(traj);
-
 			result.push_back(part_input);
 		}
+
+		// Infer particle hierarchy
+		_hierarchy_alg.SetParentInfo(result);
+
+		// Infer creation process type
+		for(unsigned int idx=0; idx<result.size(); ++idx) {
+			auto const& edepsim_part = ev->Trajectories[idx];
+			auto& part_input = result[idx];
+			part_input.type = this->InferProcessType(edepsim_part, part_input.part);
+		}
+
 	}
 
 	supera::Particle SuperaDriver::TG4TrajectoryToParticle(const TG4Trajectory& edepsim_part)
@@ -61,11 +68,13 @@ namespace edep2supera {
 		return result;
 	}
 
-	supera::ProcessType SuperaDriver::InferProcessType(const TG4Trajectory& edepsim_part)
+	supera::ProcessType 
+	SuperaDriver::InferProcessType(const TG4Trajectory& edepsim_part, 
+		const supera::Particle& supera_part)
 	{
 
 
-		auto pdg_code = edepsim_part.GetPDGCode();
+		auto pdg_code    = supera_part.pdg;
 		auto g4type_main = edepsim_part.Points.front().GetProcess();
 		auto g4type_sub  = edepsim_part.Points.front().GetSubprocess();
 
