@@ -2,6 +2,7 @@
 
 #include "SuperaDriver.h"
 #include "supera/data/Particle.h"
+#include "supera/base/meatloaf.h"
 #include <iostream>
 
 namespace edep2supera { 
@@ -73,38 +74,73 @@ namespace edep2supera {
 		const supera::Particle& supera_part)
 	{
 
-
 		auto pdg_code    = supera_part.pdg;
 		auto g4type_main = edepsim_part.Points.front().GetProcess();
 		auto g4type_sub  = edepsim_part.Points.front().GetSubprocess();
 
+		unsigned int semantic_type;
 
 		if(pdg_code == 22) {
 			return supera::kPhoton;
 		}else if(std::abs(pdg_code) == 11) {
-			std::cout << "PDG " << pdg_code << " G4ProcessType " << g4type_main 
-			<< " SubProcessType " << g4type_sub
-			<< std::endl;
-			/*
-			std::string prc = mcpart.Process();
-			if( prc == "muIoni" || prc == "hIoni" || prc == "muPairProd" )
-				grp.type = supera::kDelta;
-			else if( prc == "muMinusCaptureAtRest" || prc == "muPlusCaptureAtRest" || prc == "Decay" )
-				grp.type = supera::kDecay;
-			else if( prc == "compt"  )
-				grp.type = supera::kCompton;
-			else if( prc == "phot"   )
-				grp.type = supera::kPhotoElectron;
-			else if( prc == "eIoni"  )
-				grp.type = supera::kIonization;
-			else if( prc == "conv"   )
-				grp.type = supera::kConversion;
-			else if( prc == "primary")
-				grp.type = supera::kPrimary;
-			else
-				grp.type = supera::kOtherShower;
-			*/
-			return supera::kOtherShower;			
+			if( supera_part.parent_trackid == -1 ){
+				return supera::kPrimary;
+			}
+			else if( g4type_main == TG4TrajectoryPoint::G4ProcessType::kProcessElectromagetic ) {
+				if( g4type_sub == TG4TrajectoryPoint::G4ProcessSubtype::kSubtypeEMPhotoelectric ) {
+					return supera::kPhotoElectron;
+				}
+				else if( g4type_sub == TG4TrajectoryPoint::G4ProcessSubtype::kSubtypeEMComptonScattering ) {
+					return supera::kCompton;
+				}
+				else if( g4type_sub == TG4TrajectoryPoint::G4ProcessSubtype::kSubtypeEMGammaConversion ) {
+					return supera::kConversion;
+				}else if( g4type_sub == TG4TrajectoryPoint::G4ProcessSubtype::kSubtypeEMIonization ) {
+					if( std::abs(supera_part.parent_pdg) == 11 ) {
+						return supera::kIonization;
+					}else if(std::abs(supera_part.parent_pdg) == 211 || 
+						std::abs(supera_part.parent_pdg) == 13 || 
+						std::abs(supera_part.parent_pdg) == 2212) {
+						return supera::kDelta;
+					}else{
+						std::cout << "UNEXPECTED CASE for IONIZATION " << std::endl
+						<< "PDG " << pdg_code 
+						<< " TrackId " << edepsim_part.TrackId
+						<< " Energy " << supera_part.energy_init 
+						<< " Parent PDG " << supera_part.parent_pdg 
+						<< " Parent TrackId " << edepsim_part.ParentId
+						<< " G4ProcessType " << g4type_main 
+						<< " SubProcessType " << g4type_sub
+						<< std::endl;
+						throw supera::meatloaf();
+					}
+				}else{
+					std::cout << "UNEXPECTED EM SubType " << std::endl
+					<< "PDG " << pdg_code 
+					<< " TrackId " << edepsim_part.TrackId
+					<< " Energy " << supera_part.energy_init 
+					<< " Parent PDG " << supera_part.parent_pdg 
+					<< " Parent TrackId " << edepsim_part.ParentId
+					<< " G4ProcessType " << g4type_main 
+					<< " SubProcessType " << g4type_sub
+					<< std::endl;
+					throw supera::meatloaf();
+				}
+			}
+			else if( g4type_main == TG4TrajectoryPoint::G4ProcessType::kProcessDecay ) {
+				return supera::kDecay;
+			}else{
+				std::cout << "Cannot classify this shower" << std::endl 
+				<< "PDG " << pdg_code 
+				<< " TrackId " << edepsim_part.TrackId
+				<< " Energy " << supera_part.energy_init 
+				<< " Parent PDG " << supera_part.parent_pdg 
+				<< " Parent TrackId " << edepsim_part.ParentId
+				<< " G4ProcessType " << g4type_main 
+				<< " SubProcessType " << g4type_sub
+				<< std::endl;
+				return supera::kOtherShower;
+			}
 		}
 		else {
 			if(pdg_code == 2112)
