@@ -32,8 +32,6 @@ namespace edep2supera {
 
 		supera::Point3D botleft = supera::Point3D(std::numeric_limits<double>::max(), std::numeric_limits<double>::max(), std::numeric_limits<double>::max());
 		supera::Point3D topright = supera::Point3D(-std::numeric_limits<double>::max(), -std::numeric_limits<double>::max(), -std::numeric_limits<double>::max());
-		//   std::cout << p.trackid << " " << p.energy_deposit << " adding first " << p.first_step.pos.x << " " << p.first_step.pos.y << " " << p.first_step.pos.z << std::endl;
-        //   std::cout << p.trackid << " " << p.energy_deposit << " adding last " << p.last_step.pos.x << " " << p.last_step.pos.y << " " << p.last_step.pos.z << std::endl;
 		for (auto &PI : result)
 		{
 			const double epsilon = 1.e-3;
@@ -62,8 +60,6 @@ namespace edep2supera {
 
 		std::map<supera::TrackID_t, supera::InstanceID_t> tid_to_res; // map from track_id to result vector index
 
-		//std::cout << "trajectories started" << std::endl;
-
 		for (auto const &traj : ev->Trajectories)
 		{
 			supera::ParticleInput part_input;
@@ -82,7 +78,6 @@ namespace edep2supera {
 		//store.SetParentInfo(result);
 		//mcparticletree 
 
-		//std::cout << "trajectories 1 done" << std::endl;
 
 		// for (auto const &traj : ev->Trajectories)
 		// {
@@ -90,7 +85,6 @@ namespace edep2supera {
 		// 	TrackID_t par_tid = result[resid].part.parent_trackid;
 		// 	InstanceID_t par_resid=tid_to_res[par_tid];
 
-		// 	//std::cout << "quarter way" << std::endl;
 
 		// 	result[resid].part.parent_pdg=result[par_resid].part.pdg;
 		// 	result[resid].part.parent_process=result[par_resid].part.process;
@@ -100,43 +94,35 @@ namespace edep2supera {
 		// 	{
 		// 		result[par_resid].part.children_id.push_back(resid);
 		// 	}
-			
 
 		// 	InstanceID_t store=resid;
-		// 	//std::cout << "halfway" << std::endl;
 		// 	while (result[store].part.parent_trackid != 0 && result[store].part.parent_trackid !=kINVALID_TRACKID)// && result[store].part.parent_trackid != -1)
 		// 	{
-		// 		//std::cout <<"previous"<< store << std::endl;
 		// 		store = tid_to_res[result[store].part.parent_trackid];
-		// 		//std::cout << "next" << store << std::endl;
 		// 	}
 			
-			
-
-		// 	//std::cout << "after while" << std::endl;
 
 		// 	result[resid].part.ancestor_vtx = result[store].part.parent_vtx;
 		// 	result[resid].part.ancestor_pdg = result[store].part.parent_pdg;
 		// 	result[resid].part.ancestor_process = result[store].part.parent_process;
 		// }
 
-		//std::cout << "trajectories 2 done" << std::endl;
-
-		// if usenaturalbbox: ImageMeta3D meta=BBI.Generate(result);
-
-		// else if config exists
-		// {
-		// 	if UseBBoxFromSBBI = true: BBI.Configure(cfg) // need cfg ???????????
-		// }
-		// else throw meatloaf();
-
-		if (ev->SegmentDetectors.size()>1) LOG.DEBUG() << "Multiple detectors, accepting ??????????????" << "\n";
-		// what to do about multiple segment detectors????????????
+	
 		for (auto const &det : ev->SegmentDetectors)
 		{
+			if (ev->SegmentDetectors.size() > 0)
+			{
+				std::cout << "Accepting list of active regions from config"<< std::endl;
+				if (std::find(allowed_detectors.begin(), allowed_detectors.end(), det.first) == allowed_detectors.end())
+				{
+					std::cout << det.first<< " not in acceptable active regions"<< std::endl;
+					break;
+				}
+
+			}
 			for (auto const &dep : det.second)
 			{
-				
+
 				for (auto const &tid : dep.Contrib)
 				{
 					auto const& start = dep.GetStart();
@@ -161,8 +147,6 @@ namespace edep2supera {
 						}
 					else LOG.ERROR() <<"energy deposition logic makes no sense" <<"\n";
 
-					//what to do with multiple detectors????????
-					//what to do with config???????????????
 					if (dep.Contrib.size() > 1)
 					{	
 						LOG.ERROR() <<"multiple contributors to energy depositions, set /edep/hitSeparation<=0"<<"\n";
@@ -170,7 +154,6 @@ namespace edep2supera {
 					}
 				}
 				
-					
 			}
 		}
 		ExpandBBox(result);
@@ -182,20 +165,26 @@ namespace edep2supera {
 		LOG.DEBUG() << "starting voxelization"<< "\n";
 		std::map<supera::TrackID_t, supera::InstanceID_t> tid_to_res; // map from track_id to result vector index
 		for (auto const &PI : result) tid_to_res[PI.part.trackid] = PI.part.id;
-		LOG.DEBUG() << "voxelization 1"<< "\n";
 		for (auto const &det : ev->SegmentDetectors)
 		{
+			if (ev->SegmentDetectors.size() > 0)
+			{
+				std::cout << "Accepting list of active regions from config"<< std::endl;
+				if (std::find(allowed_detectors.begin(), allowed_detectors.end(), det.first) == allowed_detectors.end())
+				{
+					std::cout << det.first<< "not in acceptable active regions"<< std::endl;
+					break;
+				}
+
+			}
 			for (auto const &dep : det.second)
 			{
 				for (auto const &tid : dep.Contrib)
 				{
 					// auto const& start = dep.GetStart();
 					// auto const& end   = dep.GetStop();
-					//LOG.DEBUG() << "voxelization 2"<< "\n";
 					supera::InstanceID_t resid = tid_to_res[tid];
-					//LOG.DEBUG() << "voxelization 3"<< "\n";
 					std::vector<supera::EDep> myedeps = MakeEDeps(dep, meta, result[resid].part.dist_travel);
-					//LOG.DEBUG() << "voxelization 4"<< "\n";
 					// if (dep.GetEnergyDeposit() > 0)
 					// {
 					// 	std::cout << dep.GetStart().X() / 10. << " " << dep.GetStart().Y() / 10. << " " << dep.GetStart().Z() / 10. << " " << dep.GetEnergyDeposit() << " dep start xyz,e" << std::endl;
@@ -203,16 +192,8 @@ namespace edep2supera {
 					// 	std::cout << myedeps[0].x << " " << myedeps[0].y << " " << myedeps[0].z << std::endl;
 					// 	std::cout << myedeps[0].e << " " << myedeps[0].dedx << " edep x,y,z,e,dedx" << std::endl;
 					// }
-					//LOG.DEBUG() << "voxelization 5"<< "\n";
-					// std::cout<<"got here"<<std::endl;
-					if (result[resid].pcloud.size() == 0)
-						result[resid].pcloud = myedeps;
-					// std::cout<<"got here2"<<std::endl;
-					else if (!MakeEDeps(dep, meta).empty())
-					{
-						result[resid].pcloud.insert(result[resid].pcloud.end(), myedeps.begin(), myedeps.end());
-					}
-					//std::cout << result[resid].pcloud.size() << " pcloud size" << std::endl;
+					if (result[resid].pcloud.size() == 0) result[resid].pcloud = myedeps;
+					else result[resid].pcloud.insert(result[resid].pcloud.end(), myedeps.begin(), myedeps.end());
 
 					if (dep.Contrib.size() > 1)
 					{
@@ -222,10 +203,20 @@ namespace edep2supera {
 				}
 			}
 		}
-		std::cout << "energy dep done" << std::endl;
+		for (auto &PI : result)
+		{
+			std::cout << PI.pcloud.size() << " pcloud size "<<PI.part.energy_deposit<< " energy deposit " <<PI.part.trackid<< " trackid "<<PI.part.parent_trackid<< " parent_trackid"<< std::endl;
+			std::cout <<"           "<< PI.part.first_step.pos.x << " " << PI.part.first_step.pos.y << " " << PI.part.first_step.pos.z << " first step pos " << std::endl;
+			std::cout <<"           "<< PI.part.last_step.pos.x << " " << PI.part.last_step.pos.y << " " << PI.part.last_step.pos.z << " last step pos " << std::endl;
+			std::cout << "           " << PI.edep_bottom_left.x << " " << PI.edep_bottom_left.y << " " << PI.edep_bottom_left.z << " edep_bottom_left " << std::endl;
+			std::cout << "           " << PI.edep_top_right.x << " " << PI.edep_top_right.y << " " << PI.edep_top_right.z << " edep_top_right " << std::endl;
+			std::cout << "    " << PI.part.id << " id " << PI.part.pdg << " pdg " << PI.part.energy_init << " energy_init " << PI.part.dist_travel << " dist_travel????????" << std::endl;
+			std::cout << "    " << PI.part.vtx.pos.x << " " << PI.part.vtx.pos.y << " " << PI.part.vtx.pos.z << " " << PI.part.vtx.time<< " vtx " << std::endl;
+			std::cout << "    " << PI.part.end_pt.pos.x << " " << PI.part.end_pt.pos.y << " " << PI.part.end_pt.pos.z << " " << PI.part.end_pt.time << " end_pt " << std::endl;
+			std::cout << "    " << PI.part.px << " " << PI.part.py << " " << PI.part.pz << " " << " momentum " << std::endl;
 		}
 
-
+	}
 
 	supera::Particle SuperaDriver::TG4TrajectoryToParticle(const TG4Trajectory& edepsim_part)
 	{
@@ -246,12 +237,6 @@ namespace edep2supera {
 		result.energy_init = edepsim_part.GetInitialMomentum().E();										///< initial energy of the particle
 		result.parent_trackid = edepsim_part.GetParentId();												///< PDG code of the parent particle
 
-		// TODO ??????????????????????
-
-		// double dist_travel;	   ///< filled only if MCTrack origin: distance measured along the trajectory
-
-		// InstanceID_t group_id;						   ///< "ID" to group multiple particles together (for clustering purpose)
-		// InstanceID_t interaction_id;				   ///< "ID" to group multiple particles per interaction
 
 		return result;
 	}
@@ -329,32 +314,4 @@ namespace edep2supera {
 			return supera::kTrack;
 		}
 	}
-	// void SuperaDriver::configure(const std::string config_file)
-	// {
-	// 	LOG.DEBUG() << "Called" << "\n";
-	// 	// check state
-	// 	if (_processing)
-	// 	{
-	// 		LOG.ERROR() << "Must call finalize() before calling initialize() after starting to process..." << "\n";
-	// 		throw meatloaf();
-	// 	}
-	// 	// check cfg file
-	// 	if (config_file.empty())
-	// 	{
-	// 		LOG.ERROR() << "Config file not set!" << "\n";
-	// 		throw meatloaf();
-	// 	}
-
-	// 	// check cfg content top level
-	// 	auto main_cfg = CreatePSetFromFile(config_file);
-	// 	if (!main_cfg.contains_pset(name()))
-	// 	{
-	// 		LOG.ERROR() << "ProcessDriver configuration (" << name() << ") not found in the config file (dump below)" 
-	// 						 << main_cfg.dump()
-	// 						 << "\n";
-	// 		throw meatloaf();
-	// 	}
-	// 	auto const cfg = main_cfg.get<PSet>(name());
-	// 	configure(cfg);
-	//}
 }

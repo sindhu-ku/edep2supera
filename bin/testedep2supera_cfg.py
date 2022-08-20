@@ -31,7 +31,7 @@ import ROOT
 # }
 
 edep2supera_cfg = ROOT.std.map("std::string,std::string")()
-edep2supera_cfg["ActiveDetectors"]="['TPCActive_shape']"
+edep2supera_cfg["ActiveDetectors"]="[TPCActive_shape]"
 edep2supera_cfg["LogLevel"]="VERBOSE"
 
 label_cfg = ROOT.std.map("std::string,std::string")()

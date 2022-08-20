@@ -6,11 +6,11 @@
 #include "supera/base/PSet.h"
 #include "supera/algorithm/Loggable.h"
 //#include "LArCVBaseUtilFunc.h"
-#include "supera/algorithm/BBoxInteraction.h"
 #include "supera/process/Driver.h"
 #include "supera/algorithm/ParticleIndex.h"
 #include "Voxelize.h"
 #include "supera/base/meatloaf.h"
+#include <algorithm>
 
 namespace edep2supera {
 

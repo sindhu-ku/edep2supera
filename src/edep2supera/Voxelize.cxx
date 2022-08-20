@@ -56,20 +56,20 @@ namespace supera
     //   return &(*itPart);
     // };
 
-    int trackId; // = hitSegment.GetPrimaryId();
-    if (hitSegment.Contrib.size() == 1)
-      trackId = hitSegment.Contrib.front();
-    //else if (std::find(hitSegment.Contrib.begin(), hitSegment.Contrib.end(), hitSegment.GetPrimaryId()) != hitSegment.Contrib.end())
-    //  trackId = hitSegment.GetPrimaryId();
-    else
-    {
-      //Logger(WARNING) << "Could not determine which GEANT track ID to assign edep-sim energy to!" << std::endl;
-      std::stringstream trks;
-      std::for_each(std::begin(hitSegment.Contrib), std::end(hitSegment.Contrib),
-                    [&trks](const int trk) { trks << " " << trk; });
-      //Logger(WARNING) << "  Chose the first of:" << trks.str() << std::endl;
-      trackId = hitSegment.Contrib.front();
-    }
+    // int trackId; // = hitSegment.GetPrimaryId();
+    // if (hitSegment.Contrib.size() == 1)
+    //   trackId = hitSegment.Contrib.front();
+    // //else if (std::find(hitSegment.Contrib.begin(), hitSegment.Contrib.end(), hitSegment.GetPrimaryId()) != hitSegment.Contrib.end())
+    // //  trackId = hitSegment.GetPrimaryId();
+    // else
+    // {
+    //   //Logger(WARNING) << "Could not determine which GEANT track ID to assign edep-sim energy to!" << std::endl;
+    //   std::stringstream trks;
+    //   std::for_each(std::begin(hitSegment.Contrib), std::end(hitSegment.Contrib),
+    //                 [&trks](const int trk) { trks << " " << trk; });
+    //   //Logger(WARNING) << "  Chose the first of:" << trks.str() << std::endl;
+    //   trackId = hitSegment.Contrib.front();
+    // }
     //auto particle = FindParticle(trackId);
 
     // Logger(DEBUG) << "Voxelizing TG4HitSegment for GEANT track " << trackId
@@ -168,7 +168,7 @@ namespace supera
         newEDep.dedx=energyInVoxel/dx;
         EDeps.push_back(newEDep);
       }
-        
+      if (dist_travel==-1) dist_travel=0;
       dist_travel += dx;
       //dist_section += dx;
       //energy_deposit += energyInVoxel;
