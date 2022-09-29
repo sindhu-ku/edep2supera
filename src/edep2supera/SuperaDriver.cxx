@@ -112,7 +112,21 @@ namespace edep2supera {
 			for (auto const &hit : det.second)
 			{
 
-				auto track_id = hit.GetPrimaryId();
+				auto track_id = hit.Contrib.front();
+
+				for(size_t i=0; hit.Contrib.size()>1 && i<hit.Contrib.size(); ++i) {
+					auto const& tid = hit.Contrib[i];
+					int pdg = -1;
+					double energy = -1;
+					if(tid < _trackid2idx.size() && _trackid2idx[tid]>=0) {
+						auto const& part = result[_trackid2idx[tid]].part;
+						pdg = part.pdg;
+						energy = part.energy_init; 
+					}
+					LOG.WARNING() << "A segment with multiple tracks: ID " << tid 
+					<< " PDG " << pdg << " Energy " << energy << "\n";
+				}
+
 				if(track_id >=_trackid2idx.size() || _trackid2idx[track_id] < 0) {
 					LOG.ERROR() << "Segment for invalid particle (Track ID " << track_id << " unknown)\n";
 					continue;
@@ -132,19 +146,7 @@ namespace edep2supera {
 					for(auto& edep : edeps) pcloud.push_back(edep);
 				}
 
-				for (auto const &tid : hit.Contrib)
-				{
-					if(tid == track_id) continue;
-					int pdg = -1;
-					double energy = -1;
-					if(tid < _trackid2idx.size() && _trackid2idx[tid]>=0) {
-						auto const& part = result[_trackid2idx[tid]].part;
-						pdg = part.pdg;
-						energy = part.energy_init; 
-					}
-					LOG.WARNING() << "Contributing track " << tid 
-					<< " PDG " << pdg << " Energy " << energy << "\n";
-				}
+
 			}
 		}
 	}
