@@ -21,7 +21,7 @@ add_definitions(-DBUILD_PYTHON_BINDINGS)
 #########
 find_package(PythonLibs REQUIRED)
 message("    Adding Python")
-message("    INCLUDE: ", ${PYTHON_INCLUDE_DIRS})
+message("    INCLUDE: " , ${PYTHON_INCLUDE_DIRS})
 include_directories(${PYTHON_INCLUDE_DIRS})
 
 if(NOT PYTHON_EXECUTABLE)
@@ -104,19 +104,19 @@ include_directories(${SUPERA_INCLUDE_DIR})
 
 ####################################
 # Add larcv
-####################################
-#execute_process(COMMAND 
-#    "${PYTHON_EXECUTABLE}" -c "import larcv;print(larcv.get_lib_dir(),end='');"
-#    OUTPUT_VARIABLE
-#    LARCV_LIB_DIR)
-#execute_process(COMMAND 
-#    "${PYTHON_EXECUTABLE}" -c "import larcv;print(larcv.get_includes(),end='');"
-#    OUTPUT_VARIABLE
-#    LARCV_INCLUDE_DIR)
+# ###################################
+#execute_process(COMMAND
+# "${PYTHON_EXECUTABLE}" -c "import larcv;print(larcv.get_lib_dir(),end='');"
+# OUTPUT_VARIABLE
+# LARCV_LIB_DIR)
+#execute_process(COMMAND
+# "${PYTHON_EXECUTABLE}" -c "import larcv;print(larcv.get_includes(),end='');"
+# OUTPUT_VARIABLE
+# LARCV_INCLUDE_DIR)
 #
-#message("    Adding larcv")
-#message("    INCLUDE: " ${LARCV_INCLUDE_DIR})
-#message("    LIB:     " ${LARCV_LIB_DIR}    )
-#include_directories(${LARCV_INCLUDE_DIR})
+# message("    Adding larcv")
+# message("    INCLUDE: " ${LARCV_INCLUDE_DIR})
+# message("    LIB:     " ${LARCV_LIB_DIR}    )
+# include_directories(${LARCV_INCLUDE_DIR})
 
 add_subdirectory(edep2supera)
