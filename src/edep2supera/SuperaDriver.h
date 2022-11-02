@@ -22,7 +22,8 @@ namespace edep2supera {
 		supera::EventInput ReadEvent(const TG4Event *ev);
 		void VoxelizeEvent(const TG4Event *ev, supera::EventInput&result ) const;
 		supera::Particle TG4TrajectoryToParticle(const TG4Trajectory& edepsim_part);
-		supera::ProcessType InferProcessType(const TG4Trajectory& edepsim_part);
+		void SetProcessType(const TG4Trajectory& edepsim_part,
+			supera::Particle& supera_part);
 		void ExpandBBox(supera::EventInput& result);
 		void Configure(const std::string& name, const std::map<std::string,std::string>& params);
 		void Configure(const supera::PSet &cfg);
@@ -31,7 +32,7 @@ namespace edep2supera {
 		std::vector<std::string> allowed_detectors;
 	private:
 		double _segment_size_max; // in CM
-		std::vector<int> _trackid2idx;
+		std::vector<supera::Index_t> _trackid2idx;
 	};
 	
 }

@@ -46,7 +46,7 @@ namespace edep2supera {
 			part_input.valid   = true;
 			part_input.part    = this->TG4TrajectoryToParticle(traj);
 			part_input.part.id = result.size();
-			part_input.type    = this->InferProcessType(traj);
+			//part_input.part.type = this->InferProcessType(traj,part_input.part);
 
 			LOG.VERBOSE() << "  Track ID " << part_input.part.trackid 
 			<< " PDG " << part_input.part.pdg 
@@ -56,11 +56,23 @@ namespace edep2supera {
 				LOG.FATAL() << "Negative track ID found " << traj.GetTrackId() << "\n";
 				throw supera::meatloaf();
 			}
-			_trackid2idx.resize(traj.GetTrackId()+1,-1);
+			_trackid2idx.resize(traj.GetTrackId()+1,supera::kINVALID_INDEX);
 			_trackid2idx[traj.GetTrackId()] = part_input.part.id;
 			result.push_back(part_input);
 		}
 
+		// Fill parent information (needed before TG4TrajectoryToParticle is called)
+		for (size_t i=0; i<result.size(); ++i) {
+			auto& part = result[i].part;
+			auto const& traj = ev->Trajectories[i];
+
+			if(part.parent_trackid < _trackid2idx.size()) {
+				auto const& parent_index = _trackid2idx[part.parent_trackid];
+				if(parent_index != supera::kINVALID_INDEX)
+					part.parent_pdg = result[parent_index].part.pdg;
+			}
+			this->SetProcessType(traj,part);
+		}
 
 		VoxelizeEvent(ev,result);
 
@@ -118,7 +130,7 @@ namespace edep2supera {
 					auto const& tid = hit.Contrib[i];
 					int pdg = -1;
 					double energy = -1;
-					if(tid < _trackid2idx.size() && _trackid2idx[tid]>=0) {
+					if(tid < _trackid2idx.size() && _trackid2idx[tid] != supera::kINVALID_INDEX) {
 						auto const& part = result[_trackid2idx[tid]].part;
 						pdg = part.pdg;
 						energy = part.energy_init; 
@@ -127,7 +139,7 @@ namespace edep2supera {
 					<< " PDG " << pdg << " Energy " << energy << "\n";
 				}
 
-				if(track_id >=_trackid2idx.size() || _trackid2idx[track_id] < 0) {
+				if(track_id >=_trackid2idx.size() || _trackid2idx[track_id] == supera::kINVALID_INDEX) {
 					LOG.ERROR() << "Segment for invalid particle (Track ID " << track_id << " unknown)\n";
 					continue;
 				}
@@ -151,6 +163,7 @@ namespace edep2supera {
 		}
 	}
 
+
 	supera::Particle SuperaDriver::TG4TrajectoryToParticle(const TG4Trajectory& edepsim_part)
 	{
 		supera::Particle result;
@@ -168,7 +181,21 @@ namespace edep2supera {
 		result.end_pt = supera::Vertex(end.X() / 10., end.Y() / 10., end.Z() / 10., end.T());		///< (x,y,z,t) at which particle disappeared from G4WorldVolume
 		//result.process = edepsim_part.Points[0].GetProcess(); 										///< string identifier of the particle's creation process from Geant4
 		result.energy_init = edepsim_part.GetInitialMomentum().E();										///< initial energy of the particle
-		result.parent_trackid = edepsim_part.GetParentId();												///< PDG code of the parent particle
+		if (edepsim_part.GetParentId() < -1) {
+			LOG.FATAL() << "Parent ID " << edepsim_part.GetParentId() << " is unexpected (cannot be < -1)\n";
+			throw supera::meatloaf();
+		}
+
+		if(edepsim_part.GetParentId() == -1)
+			result.parent_trackid = result.trackid;
+		else
+			result.parent_trackid = edepsim_part.GetParentId();
+
+		if(result.trackid == supera::kINVALID_TRACKID || result.parent_trackid == supera::kINVALID_TRACKID) {
+			LOG.FATAL() << "Unexpected to have an invalid track ID " << edepsim_part.GetTrackId() 
+			<< " or parent track ID " << edepsim_part.GetParentId() << "\n";
+			throw supera::meatloaf();
+		}
 
 
 		return result;
@@ -197,59 +224,90 @@ namespace edep2supera {
 		}
 	}
 */
-	supera::ProcessType SuperaDriver::InferProcessType(const TG4Trajectory& edepsim_part)
+
+	void
+	SuperaDriver::SetProcessType(const TG4Trajectory& edepsim_part, 
+		supera::Particle& supera_part)
 	{
-		auto pdg_code = edepsim_part.GetPDGCode();
+
+		auto pdg_code    = supera_part.pdg;
 		auto g4type_main = edepsim_part.Points.front().GetProcess();
 		auto g4type_sub  = edepsim_part.Points.front().GetSubprocess();
 
+		std::stringstream ss;
+		ss << (int)(g4type_main) << "::" << (int)(g4type_sub);
 
-		if(pdg_code == 22) return supera::kPhoton;
-		else if(std::abs(pdg_code) == 11) 
-		{
-			/*
-			std::cout << "PDG " << pdg_code << " G4ProcessType " << g4type_main 
-			<< " SubProcessType " << g4type_sub
-			<< std::endl;
-			*/
+		supera_part.process = ss.str();
 
-			/*
-			if (g4type_sub==2) return kIonization;
-			if (g4type_sub==13) return kPhotoElectron;
-			if (g4type_sub==13) return kCompton;
-			if (g4type_sub==14) return kConversion;
-
-
-
-
-			std::string prc = mcpart.Process();
-			if( prc == "muIoni" || prc == "hIoni" || prc == "muPairProd" )
-				grp.type = kDelta;
-			else if( prc == "muMinusCaptureAtRest" || prc == "muPlusCaptureAtRest" || prc == "Decay" )
-				grp.type = kDecay;
-			else if( prc == "compt"  )
-				grp.type = kCompton;
-			else if( prc == "phot"   )
-				grp.type = kPhotoElectron;
-			else if( prc == "eIoni"  )
-				grp.type = kIonization;
-			else if( prc == "conv"   )
-				grp.type = kConversion;
-			else if( prc == "primary")
-				grp.type = kPrimary;
-			else
-				grp.type = kOtherShower;
-			*/
-
-			return supera::kOtherShower;			
+		if(pdg_code == 22) {
+			supera_part.type = supera::kPhoton;
+		}else if(std::abs(pdg_code) == 11) {
+			if( supera_part.parent_trackid == -1 ){
+				supera_part.type = supera::kPrimary;
+			}
+			else if( g4type_main == TG4TrajectoryPoint::G4ProcessType::kProcessElectromagetic ) {
+				if( g4type_sub == TG4TrajectoryPoint::G4ProcessSubtype::kSubtypeEMPhotoelectric ) {
+					supera_part.type = supera::kPhotoElectron;
+				}
+				else if( g4type_sub == TG4TrajectoryPoint::G4ProcessSubtype::kSubtypeEMComptonScattering ) {
+					supera_part.type = supera::kCompton;
+				}
+				else if( g4type_sub == TG4TrajectoryPoint::G4ProcessSubtype::kSubtypeEMGammaConversion ) {
+					supera_part.type = supera::kConversion;
+				}else if( g4type_sub == TG4TrajectoryPoint::G4ProcessSubtype::kSubtypeEMIonization ) {
+					if( std::abs(supera_part.parent_pdg) == 11 ) {
+						supera_part.type = supera::kIonization;
+					}else if(std::abs(supera_part.parent_pdg) == 211 || 
+						std::abs(supera_part.parent_pdg) == 13 || 
+						std::abs(supera_part.parent_pdg) == 2212) {
+						supera_part.type = supera::kDelta;
+					}else{
+						std::cout << "UNEXPECTED CASE for IONIZATION " << std::endl
+						<< "PDG " << pdg_code 
+						<< " TrackId " << edepsim_part.TrackId
+						<< " Energy " << supera_part.energy_init 
+						<< " Parent PDG " << supera_part.parent_pdg 
+						<< " Parent TrackId " << edepsim_part.ParentId
+						<< " G4ProcessType " << g4type_main 
+						<< " SubProcessType " << g4type_sub
+						<< std::endl;
+						throw supera::meatloaf();
+					}
+				}else{
+					std::cout << "UNEXPECTED EM SubType " << std::endl
+					<< "PDG " << pdg_code 
+					<< " TrackId " << edepsim_part.TrackId
+					<< " Energy " << supera_part.energy_init 
+					<< " Parent PDG " << supera_part.parent_pdg 
+					<< " Parent TrackId " << edepsim_part.ParentId
+					<< " G4ProcessType " << g4type_main 
+					<< " SubProcessType " << g4type_sub
+					<< std::endl;
+					throw supera::meatloaf();
+				}
+			}
+			else if( g4type_main == TG4TrajectoryPoint::G4ProcessType::kProcessDecay ) {
+				supera_part.type = supera::kDecay;
+			}else{
+				std::cout << "Cannot classify this shower" << std::endl 
+				<< "PDG " << pdg_code 
+				<< " TrackId " << edepsim_part.TrackId
+				<< " Energy " << supera_part.energy_init 
+				<< " Parent PDG " << supera_part.parent_pdg 
+				<< " Parent TrackId " << edepsim_part.ParentId
+				<< " G4ProcessType " << g4type_main 
+				<< " SubProcessType " << g4type_sub
+				<< std::endl;
+				supera_part.type = supera::kOtherShower;
+			}
 		}
-		else if(pdg_code == 2112) return supera::kNeutron;
-		else 
-		{
-			
-			return supera::kTrack;
+		else {
+			if(pdg_code == 2112)
+				supera_part.type = supera::kNeutron;
+			supera_part.type = supera::kTrack;
 		}
-	}
+
+	} 
 
 
 }
