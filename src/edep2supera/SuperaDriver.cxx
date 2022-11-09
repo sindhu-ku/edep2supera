@@ -225,6 +225,60 @@ namespace edep2supera {
 	}
 */
 
+	/*
+	Main process type enum from G4ProcessType.hh
+	enum G4ProcessType
+	{
+		fNotDefined,
+		fTransportation,
+		fElectromagnetic,
+		fOptical,             
+		fHadronic,
+		fPhotolepton_hadron,
+		fDecay,
+		fGeneral,
+		fParameterisation,
+		fUserDefined,
+		fParallel
+	};
+
+	Sub process type enum from G4EmProcessSubType
+	enum G4EmProcessSubType 
+	{ 
+		fCoulombScattering = 1, 
+		fIonisation = 2, 
+		fBremsstrahlung = 3, 
+		fPairProdByCharged = 4,
+		fAnnihilation = 5, 
+		fAnnihilationToMuMu = 6,
+		fAnnihilationToHadrons = 7,
+		fNuclearStopping = 8,
+		fMultipleScattering = 10, 
+		fRayleigh = 11,
+		fPhotoElectricEffect = 12,
+		fComptonScattering = 13,
+		fGammaConversion = 14,
+		fGammaConversionToMuMu = 15,
+		fCerenkov = 21,
+		fScintillation = 22,
+		fSynchrotronRadiation = 23,
+		fTransitionRadiation = 24 
+	};
+
+	Sub process type enum from G4HadronicProcessType.hh
+	enum G4HadronicProcessType
+	{
+		fHadronElastic =    111,
+		fHadronInelastic =  121,
+		fCapture =          131,
+		fFission =          141,
+		fHadronAtRest =     151,
+		fLeptonAtRest =     152,
+		fChargeExchange =   161,
+		fRadioactiveDecay = 210
+	};
+	*/
+
 	void
 	SuperaDriver::SetProcessType(const TG4Trajectory& edepsim_part, 
 		supera::Particle& supera_part)
@@ -238,8 +292,9 @@ namespace edep2supera {
 		ss << (int)(g4type_main) << "::" << (int)(g4type_sub);
 
 		supera_part.process = ss.str();
-
-		if(pdg_code == 22) {
+		if(supera_part.trackid == supera_part.parent_trackid) {
+			supera_part.type = supera::kPrimary;
+		}else if(pdg_code == 22) {
 			supera_part.type = supera::kPhoton;
 		}else if(std::abs(pdg_code) == 11) {
 			if( supera_part.parent_trackid == -1 ){
