@@ -24,9 +24,10 @@ setup(
         'Source Code': 'https://github.com/DeepLearnPhysics/edep2supera'
     },
     url='https://github.com/DeepLearnPhysics/edep2supera',
-    scripts=[],
+    scripts=['bin/run_edep2supera.py'],
     packages=['edep2supera'],
     package_dir={'': 'python'},
+    package_data={'edep2supera': ['config_data/*.yaml']},
     install_requires=[
         'numpy',
         'scikit-build',

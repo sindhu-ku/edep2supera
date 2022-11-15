@@ -5,33 +5,67 @@
 #include <map>
 
 namespace edep2supera {
-	
-	void SuperaDriver::Configure(const std::string& name, const std::map<std::string,std::string>& params)
-    {
-        if(name == "edep2supera") {
-            supera::PSet cfg;
-            cfg.data = params;
-			Configure(cfg);
-			SetLogConfig(supera::Logger::parseStringThresh(cfg.get<std::string>("LogLevel","WARNING")));
-        }
-        else{
-            std::string msg = name + " is not known to Supera...";
-            throw supera::meatloaf(msg);
-        }
 
-    }
-
-	void SuperaDriver::Configure(const supera::PSet &cfg)
+	void SuperaDriver::Configure(const YAML::Node& cfg)
 	{
-		if (cfg.exists("ActiveDetectors") > 0) 
-			allowed_detectors = cfg.get<std::vector<std::string>>("ActiveDetectors");
-		_segment_size_max = cfg.get<double>("MaxSegmentSize",0.03);
+		_allowed_detectors.clear();
+		if (cfg["ActiveDetectors"]) {
+			if(cfg["ActiveDetectors"].IsSequence())
+				_allowed_detectors = cfg["ActiveDetectors"].as<std::vector<std::string> >();
+			else
+				_allowed_detectors.push_back(cfg["ActiveDetectors"].as<std::string>());
+		}
+
+		_segment_size_max = 0.03;
+		if (cfg["MaxSegmentSize"])
+			_segment_size_max = cfg["MaxSegmentSize"].as<double>();
+
+		supera::Driver::Configure(cfg);
 	}
 
+	/*
+	void SuperaDriver::ConfigureFromTest(const std::string& yaml_text)
+	{
+        auto cfg = YAML::LoadFile(yaml_text);
+
+		_allowed_detectors.clear();
+		if (cfg["ActiveDetectors"]) {
+			if(cfg["ActiveDetectors"].IsSequence())
+				_allowed_detectors = cfg["ActiveDetectors"].as<std::vector<std::string> >();
+			else
+				_allowed_detectors.push_back(cfg["ActiveDetectors"].as<std::string>());
+		}
+
+		_segment_size_max = 0.03;
+		if (cfg["MaxSegmentSize"])
+			_segment_size_max = cfg["MaxSegmentSize"].as<double>();
+
+		supera::Driver::Configure(cfg);
+	}
+
+	void SuperaDriver::ConfigureFromFile(const std::string& yaml_file)
+	{
+        auto cfg = YAML::LoadFile(yaml_file);
+
+		_allowed_detectors.clear();
+		if (cfg["ActiveDetectors"]) {
+			if(cfg["ActiveDetectors"].IsSequence())
+				_allowed_detectors = cfg["ActiveDetectors"].as<std::vector<std::string> >();
+			else
+				_allowed_detectors.push_back(cfg["ActiveDetectors"].as<std::string>());
+		}
+
+		_segment_size_max = 0.03;
+		if (cfg["MaxSegmentSize"])
+			_segment_size_max = cfg["MaxSegmentSize"].as<double>();
+
+		supera::Driver::Configure(cfg);
+	}
+	*/
 	supera::EventInput SuperaDriver::ReadEvent(const TG4Event *ev) // returns a supera.Event to be used in SuperaAtomic
 	{
 		supera::EventInput result;
-		LOG.VERBOSE() << "Processing " << ev->Trajectories.size() << " trajectories.\n";
+		LOG_VERBOSE() << "Processing " << ev->Trajectories.size() << " trajectories.\n";
 		result.reserve(ev->Trajectories.size());
 
 		// index map from track_id to result vector index 
@@ -48,12 +82,12 @@ namespace edep2supera {
 			part_input.part.id = result.size();
 			//part_input.part.type = this->InferProcessType(traj,part_input.part);
 
-			LOG.VERBOSE() << "  Track ID " << part_input.part.trackid 
+			LOG_VERBOSE() << "  Track ID " << part_input.part.trackid 
 			<< " PDG " << part_input.part.pdg 
 			<< " Energy " << part_input.part.energy_init << "\n";
 			// Critical check: all track ID must be an integer >=0
 			if(traj.GetTrackId() < 0) {
-				LOG.FATAL() << "Negative track ID found " << traj.GetTrackId() << "\n";
+				LOG_FATAL() << "Negative track ID found " << traj.GetTrackId() << "\n";
 				throw supera::meatloaf();
 			}
 			_trackid2idx.resize(traj.GetTrackId()+1,supera::kINVALID_INDEX);
@@ -109,15 +143,15 @@ namespace edep2supera {
 	void SuperaDriver::VoxelizeEvent(const TG4Event *ev, 
 		supera::EventInput &result) const
 	{
-		LOG.DEBUG() << "starting voxelization"<< "\n";
+		LOG_DEBUG() << "starting voxelization"<< "\n";
 
 		for (auto const &det : ev->SegmentDetectors)
 		{
 
-			LOG.DEBUG() << "Accepting list of active regions from config\n";
-			if (std::find(allowed_detectors.begin(), allowed_detectors.end(), det.first) == allowed_detectors.end())
+			LOG_DEBUG() << "Accepting list of active regions from config\n";
+			if (std::find(_allowed_detectors.begin(), _allowed_detectors.end(), det.first) == _allowed_detectors.end())
 			{
-				LOG.INFO() << det.first<< "not in acceptable active regions\n";
+				LOG_INFO() << det.first<< "not in acceptable active regions\n";
 				continue;
 			}
 
@@ -130,24 +164,24 @@ namespace edep2supera {
 					auto const& tid = hit.Contrib[i];
 					int pdg = -1;
 					double energy = -1;
-					if(tid < _trackid2idx.size() && _trackid2idx[tid] != supera::kINVALID_INDEX) {
+					if(tid < (int)(_trackid2idx.size()) && _trackid2idx[tid] != supera::kINVALID_INDEX) {
 						auto const& part = result[_trackid2idx[tid]].part;
 						pdg = part.pdg;
 						energy = part.energy_init; 
 					}
-					LOG.WARNING() << "A segment with multiple tracks: ID " << tid 
+					LOG_WARNING() << "A segment with multiple tracks: ID " << tid 
 					<< " PDG " << pdg << " Energy " << energy << "\n";
 				}
 
-				if(track_id >=_trackid2idx.size() || _trackid2idx[track_id] == supera::kINVALID_INDEX) {
-					LOG.ERROR() << "Segment for invalid particle (Track ID " << track_id << " unknown)\n";
+				if(track_id >= (int)(_trackid2idx.size()) || _trackid2idx[track_id] == supera::kINVALID_INDEX) {
+					LOG_ERROR() << "Segment for invalid particle (Track ID " << track_id << " unknown)\n";
 					continue;
 				}
 
 				auto& part = result[_trackid2idx[track_id]];
 				auto& pcloud = part.pcloud;
 				auto edeps = MakeEDeps(hit);
-				LOG.DEBUG() << "Segment for track " << part.part.trackid << " " << part.part.pdg 
+				LOG_DEBUG() << "Segment for track " << part.part.trackid << " " << part.part.pdg 
 				<< " Energy total " << hit.GetEnergyDeposit() 
 				<< " (" << hit.GetSecondaryDeposit() << ")" 
 				<< " dE/dX " << edeps[0].dedx
@@ -182,7 +216,7 @@ namespace edep2supera {
 		//result.process = edepsim_part.Points[0].GetProcess(); 										///< string identifier of the particle's creation process from Geant4
 		result.energy_init = edepsim_part.GetInitialMomentum().E();										///< initial energy of the particle
 		if (edepsim_part.GetParentId() < -1) {
-			LOG.FATAL() << "Parent ID " << edepsim_part.GetParentId() << " is unexpected (cannot be < -1)\n";
+			LOG_FATAL() << "Parent ID " << edepsim_part.GetParentId() << " is unexpected (cannot be < -1)\n";
 			throw supera::meatloaf();
 		}
 
@@ -192,7 +226,7 @@ namespace edep2supera {
 			result.parent_trackid = edepsim_part.GetParentId();
 
 		if(result.trackid == supera::kINVALID_TRACKID || result.parent_trackid == supera::kINVALID_TRACKID) {
-			LOG.FATAL() << "Unexpected to have an invalid track ID " << edepsim_part.GetTrackId() 
+			LOG_FATAL() << "Unexpected to have an invalid track ID " << edepsim_part.GetTrackId() 
 			<< " or parent track ID " << edepsim_part.GetParentId() << "\n";
 			throw supera::meatloaf();
 		}
@@ -292,15 +326,14 @@ namespace edep2supera {
 		ss << (int)(g4type_main) << "::" << (int)(g4type_sub);
 
 		supera_part.process = ss.str();
-		if(supera_part.trackid == supera_part.parent_trackid) {
+		if(pdg_code == 2112 || pdg_code > 1000000000)
+			supera_part.type = supera::kNeutron;
+		else if(supera_part.trackid == supera_part.parent_trackid) {
 			supera_part.type = supera::kPrimary;
 		}else if(pdg_code == 22) {
 			supera_part.type = supera::kPhoton;
 		}else if(std::abs(pdg_code) == 11) {
-			if( supera_part.parent_trackid == -1 ){
-				supera_part.type = supera::kPrimary;
-			}
-			else if( g4type_main == TG4TrajectoryPoint::G4ProcessType::kProcessElectromagetic ) {
+			if( g4type_main == TG4TrajectoryPoint::G4ProcessType::kProcessElectromagetic ) {
 				if( g4type_sub == TG4TrajectoryPoint::G4ProcessSubtype::kSubtypeEMPhotoelectric ) {
 					supera_part.type = supera::kPhotoElectron;
 				}
@@ -317,7 +350,7 @@ namespace edep2supera {
 						std::abs(supera_part.parent_pdg) == 2212) {
 						supera_part.type = supera::kDelta;
 					}else{
-						std::cout << "UNEXPECTED CASE for IONIZATION " << std::endl
+						LOG_WARNING() << "UNEXPECTED CASE for IONIZATION " << std::endl
 						<< "PDG " << pdg_code 
 						<< " TrackId " << edepsim_part.TrackId
 						<< " Energy " << supera_part.energy_init 
@@ -326,10 +359,11 @@ namespace edep2supera {
 						<< " G4ProcessType " << g4type_main 
 						<< " SubProcessType " << g4type_sub
 						<< std::endl;
-						throw supera::meatloaf();
+						//throw supera::meatloaf();
+						supera_part.type = supera::kIonization;
 					}
 				}else{
-					std::cout << "UNEXPECTED EM SubType " << std::endl
+					LOG_FATAL() << "UNEXPECTED EM SubType " << std::endl
 					<< "PDG " << pdg_code 
 					<< " TrackId " << edepsim_part.TrackId
 					<< " Energy " << supera_part.energy_init 
@@ -344,7 +378,7 @@ namespace edep2supera {
 			else if( g4type_main == TG4TrajectoryPoint::G4ProcessType::kProcessDecay ) {
 				supera_part.type = supera::kDecay;
 			}else{
-				std::cout << "Cannot classify this shower" << std::endl 
+				LOG_WARNING() << "Cannot classify this shower" << std::endl 
 				<< "PDG " << pdg_code 
 				<< " TrackId " << edepsim_part.TrackId
 				<< " Energy " << supera_part.energy_init 
@@ -357,8 +391,6 @@ namespace edep2supera {
 			}
 		}
 		else {
-			if(pdg_code == 2112)
-				supera_part.type = supera::kNeutron;
 			supera_part.type = supera::kTrack;
 		}
 
