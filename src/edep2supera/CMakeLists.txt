@@ -5,11 +5,13 @@ file(GLOB SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cxx)
 file(GLOB HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.h)
 list(REMOVE_ITEM HEADERS "LinkDef.h")
 
+message("HEADERS: ${HEADERS}")
+
 # Generate dictionary
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 ROOT_GENERATE_DICTIONARY(G__edep2supera
   ${HEADERS}
-  #OPTIONS -inlineInputHeader
+  OPTIONS -inlineInputHeader
   LINKDEF LinkDef.h)
 
 # Build the library.
@@ -28,7 +30,7 @@ install(TARGETS edep2supera
     LIBRARY DESTINATION ${CMAKE_PACKAGE_DIR}/lib
     ARCHIVE DESTINATION ${CMAKE_PACKAGE_DIR}/lib
     RUNTIME DESTINATION ${CMAKE_PACKAGE_DIR}/bin
-    INCLUDES DESTINATION ${CMAKE_PACKAGE_DIR}/include
+    #INCLUDES DESTINATION ${CMAKE_PACKAGE_DIR}/include
     )
 
 install (FILES ${HEADERS}
