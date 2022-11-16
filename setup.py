@@ -15,8 +15,8 @@ setup(
         #'-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON',
         '-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.9',
     ],
-    author=['Kazuhiro Terao'],
-    author_email='kterao@slac.stanford.edu',
+    author=['Kazuhiro Terao, Zach Hulcher'],
+    author_email='kterao@slac.stanford.edu, zhulchero@slac.stanford.edu',
     description='Supera interface for EDepSim input data files',
     license='MIT',
     keywords='supera edep-sim larcv larcv3 neutrinos deep learning lartpc_mlreco3d',
@@ -24,9 +24,10 @@ setup(
         'Source Code': 'https://github.com/DeepLearnPhysics/edep2supera'
     },
     url='https://github.com/DeepLearnPhysics/edep2supera',
-    scripts=[],
+    scripts=['bin/run_edep2supera.py'],
     packages=['edep2supera'],
     package_dir={'': 'python'},
+    package_data={'edep2supera': ['config_data/*.yaml']},
     install_requires=[
         'numpy',
         'scikit-build',

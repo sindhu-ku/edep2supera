@@ -10,6 +10,8 @@ inc_path = os.path.dirname(__file__) + "/include/"
 ROOT.gSystem.Load(os.path.join(lib_path,'libedep2supera.so'))
 
 from ROOT import edep2supera
+from ROOT import supera
+supera.EDep
 
 def get_includes():
     return inc_path

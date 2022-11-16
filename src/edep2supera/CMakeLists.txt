@@ -34,4 +34,5 @@ install(TARGETS edep2supera
 install (FILES ${HEADERS}
     DESTINATION ${CMAKE_PACKAGE_DIR}/include/edep2supera/${name})
 
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libedep2supera.rootmap DESTINATION ${CMAKE_PACKAGE_DIR}/lib)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libedep2supera_rdict.pcm DESTINATION ${CMAKE_PACKAGE_DIR}/lib)
