@@ -1,3 +1,4 @@
+import os
 import edep2supera
 from edep2supera import config
 import ROOT
@@ -15,7 +16,10 @@ def dict2map(target):
 def get_edep2supera(config_key):
 
     e2s_driver = edep2supera.edep2supera.SuperaDriver()
-    e2s_driver.ConfigureFromFile(config.get_config(config_key))
+    if os.path.isfile(config_key):
+        e2s_driver.ConfigureFromFile(config_key)
+    else:
+        e2s_driver.ConfigureFromFile(config.get_config(config_key))
     
     return e2s_driver
 
