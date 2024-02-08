@@ -23,6 +23,7 @@ target_link_libraries(edep2supera
     ${ROOT_LIBRARIES}
     -L${EDepSim_DIR}/lib -ledepsim_io
     -L${SUPERA_LIB_DIR} -lsupera
+    yaml-cpp
 )
 
 # Install

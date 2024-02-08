@@ -210,7 +210,10 @@ namespace edep2supera {
 		result.pdg = edepsim_part.GetPDGCode();	 ///< PDG code
 		result.px = edepsim_part.GetInitialMomentum().Px();
 		result.py = edepsim_part.GetInitialMomentum().Py();
-		result.pz = edepsim_part.GetInitialMomentum().Pz();										///< (x,y,z) component of particle's initial momentum
+		result.pz = edepsim_part.GetInitialMomentum().Pz();				///< (x,y,z) component of particle's initial momentum
+		result.px_final = edepsim_part.Points.back().GetMomentum().X();
+		result.py_final = edepsim_part.Points.back().GetMomentum().Y();
+		result.pz_final = edepsim_part.Points.back().GetMomentum().Z();							  
 		result.vtx = supera::Vertex(start.X() / 10., start.Y() / 10., start.Z() / 10., start.T()); ///< (x,y,z,t) of particle's vertex information
 		result.end_pt = supera::Vertex(end.X() / 10., end.Y() / 10., end.Z() / 10., end.T());		///< (x,y,z,t) at which particle disappeared from G4WorldVolume
 		//result.process = edepsim_part.Points[0].GetProcess(); 										///< string identifier of the particle's creation process from Geant4
@@ -321,6 +324,11 @@ namespace edep2supera {
 		auto pdg_code    = supera_part.pdg;
 		auto g4type_main = edepsim_part.Points.front().GetProcess();
 		auto g4type_sub  = edepsim_part.Points.front().GetSubprocess();
+
+		if (g4type_main>10000||g4type_sub>10000)
+		{
+			LOG_FATAL() << "UNEXPECTED Process/Subprocess: "<<g4type_main<<"::"<<g4type_sub<< std::endl;
+		}
 
 		std::stringstream ss;
 		ss << (int)(g4type_main) << "::" << (int)(g4type_sub);

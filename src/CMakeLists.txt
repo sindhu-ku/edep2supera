@@ -71,7 +71,7 @@ endif(ROOT_FOUND)
 find_package(EDepSim REQUIRED)
 
 if(EDepSim_FOUND)
-  set(EDepSim_DIR "${EDepSim_DIR}/../../../")
+  set(EDepSim_DIR "${EDepSim_DIR}")
   include_directories(${EDepSim_DIR}/include)
 else()
   message( FATAL_ERROR "EDepSim is needed but not found. Cannot build edep2supera...")
