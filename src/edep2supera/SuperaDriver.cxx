@@ -325,10 +325,6 @@ namespace edep2supera {
 		auto g4type_main = edepsim_part.Points.front().GetProcess();
 		auto g4type_sub  = edepsim_part.Points.front().GetSubprocess();
 
-		if (g4type_main>10000||g4type_sub>10000)
-		{
-			LOG_FATAL() << "UNEXPECTED Process/Subprocess: "<<g4type_main<<"::"<<g4type_sub<< std::endl;
-		}
 
 		std::stringstream ss;
 		ss << (int)(g4type_main) << "::" << (int)(g4type_sub);
