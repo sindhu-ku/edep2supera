@@ -325,7 +325,6 @@ namespace edep2supera {
 		auto g4type_main = edepsim_part.Points.front().GetProcess();
 		auto g4type_sub  = edepsim_part.Points.front().GetSubprocess();
 
-
 		std::stringstream ss;
 		ss << (int)(g4type_main) << "::" << (int)(g4type_sub);
 
