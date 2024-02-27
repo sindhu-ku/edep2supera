@@ -64,6 +64,7 @@ def larcv_particle(p):
         larp.gen_id(p.part.genid)
     larp.pdg_code         (p.part.pdg)
     larp.momentum         (p.part.px,p.part.py,p.part.pz)
+    larp.final_momentum         (p.part.px_final,p.part.py_final,p.part.pz_final)
     
     vtx_dict = dict(position = p.part.vtx, 
                     end_position = p.part.end_pt, 
