@@ -64,7 +64,7 @@ def larcv_particle(p):
         larp.gen_id(p.part.genid)
     larp.pdg_code         (p.part.pdg)
     larp.momentum         (p.part.px,p.part.py,p.part.pz)
-    larp.final_momentum         (p.part.px_final,p.part.py_final,p.part.pz_final)
+   # larp.final_momentum         (p.part.px_final,p.part.py_final,p.part.pz_final)
     
     vtx_dict = dict(position = p.part.vtx, 
                     end_position = p.part.end_pt, 
@@ -102,6 +102,41 @@ def larcv_particle(p):
         larp.interaction_id(p.part.interaction_id)
     
     return larp
+
+def larcv_neutrino(n):
+    
+    larn = larcv.Neutrino()
+    
+        
+    larn.id                   (int(n.id))
+    larn.event_id             (int(n.event_id))   
+    larn.vertex_id            (int(n.vertex_id))
+    larn.nu_track_id          (int(n.nu_track_id))
+    larn.lepton_track_id      (int(n.lepton_track_id))
+    larn.current_type        (n.current_type)
+    larn.interaction_mode    (n.interaction_mode)
+    larn.interaction_type    (n.interaction_type)
+    larn.target              (n.target)   
+    larn.nucleon             (n.nucleon)
+    larn.quark               (n.quark)
+    larn.hadronic_invariant_mass(n.hadronic_invariant_mass)
+    larn.bjorken_x              (n.bjorken_x)
+    larn.inelasticity           (n.inelasticity)
+    larn.momentum_transfer      (n.momentum_transfer)
+    larn.momentum_transfer_mag  (n.momentum_transfer_mag)
+    larn.energy_transfer        (n.energy_transfer)
+    larn.theta               (n.theta)
+    larn.pdg_code            (n.pdg_code)
+    larn.pdg_code_lep        (n.pdg_code_lep)
+    larn.momentum            (n.px, n.py, n.pz)
+    larn.momentum_lep        (n.momentum_lep)
+    larn.distance_travel     (n.dist_travel)
+    larn.energy_init         (n.energy_init)
+    larn.energy_deposit      (n.energy_deposit)
+    larn.creation_process    (n.creation_process)
+    larn.num_voxels          (n.num_voxels)
+   
+    return larn
 
 def run_supera(out_file='larcv.root',
     in_files=[],
