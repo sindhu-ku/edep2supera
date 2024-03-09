@@ -34,7 +34,7 @@ IOManager: {
 }
 ''' 
     #f=open('tmp.cfg','w')
-    f=tempfile.NamedTemporaryFile(mode='w')
+    f=tempfile.NamedTemporaryFile(mode="w")
     f.write(cfg % outname)
     f.flush()
     o = larcv.IOManager(f.name)
@@ -64,7 +64,7 @@ def larcv_particle(p):
         larp.gen_id(p.part.genid)
     larp.pdg_code         (p.part.pdg)
     larp.momentum         (p.part.px,p.part.py,p.part.pz)
-   # larp.final_momentum         (p.part.px_final,p.part.py_final,p.part.pz_final)
+    larp.final_momentum         (p.part.px_final,p.part.py_final,p.part.pz_final)
     
     vtx_dict = dict(position = p.part.vtx, 
                     end_position = p.part.end_pt, 
@@ -108,11 +108,10 @@ def larcv_neutrino(n):
     larn = larcv.Neutrino()
     
         
-    larn.id                   (int(n.id))
-    larn.event_id             (int(n.event_id))   
-    larn.vertex_id            (int(n.vertex_id))
-    larn.nu_track_id          (int(n.nu_track_id))
-    larn.lepton_track_id      (int(n.lepton_track_id))
+    larn.id                 (int(n.id)) 
+    larn.genid              (int(n.genid))
+    larn.track_id           (int(n.track_id))
+    larn.lepton_track_id    (int(n.lepton_track_id))
     larn.current_type        (n.current_type)
     larn.interaction_mode    (n.interaction_mode)
     larn.interaction_type    (n.interaction_type)
@@ -127,9 +126,9 @@ def larcv_neutrino(n):
     larn.energy_transfer        (n.energy_transfer)
     larn.theta               (n.theta)
     larn.pdg_code            (n.pdg_code)
-    larn.pdg_code_lep        (n.pdg_code_lep)
+    larn.lepton_pdg_code     (n.lepton_pdg_code)
     larn.momentum            (n.px, n.py, n.pz)
-    larn.momentum_lep        (n.momentum_lep)
+    larn.lepton_p            (n.lepton_p)
     larn.distance_travel     (n.dist_travel)
     larn.energy_init         (n.energy_init)
     larn.energy_deposit      (n.energy_deposit)
