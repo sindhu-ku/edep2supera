@@ -233,8 +233,10 @@ namespace edep2supera {
 			<< " or parent track ID " << edepsim_part.GetParentId() << "\n";
 			throw supera::meatloaf();
 		}
-
-
+		for (size_t i = 0; i < edepsim_part.Points.size() - 1; ++i)
+		{
+			result.dist_travel += (edepsim_part.Points[i].GetPosition() - edepsim_part.Points[i + 1].GetPosition()).Vect().Mag();
+		}
 		return result;
 	}
 /*
