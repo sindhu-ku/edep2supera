@@ -34,7 +34,7 @@ IOManager: {
 }
 ''' 
     #f=open('tmp.cfg','w')
-    f=tempfile.NamedTemporaryFile(mode='w')
+    f=tempfile.NamedTemporaryFile(mode="w")
     f.write(cfg % outname)
     f.flush()
     o = larcv.IOManager(f.name)
@@ -60,8 +60,8 @@ def larcv_particle(p):
     
     # particle's info setter
     larp.track_id         (p.part.trackid)
-    if hasattr(p.part, "genid") and hasattr(larp, "gen_id"):
-        larp.gen_id(p.part.genid)
+    if hasattr(p.part, "gen_id") and hasattr(larp, "gen_id"):
+        larp.gen_id(p.part.gen_id)
     larp.pdg_code         (p.part.pdg)
     larp.momentum         (p.part.px,p.part.py,p.part.pz)
     larp.end_momentum     (p.part.end_px,p.part.end_py,p.part.end_pz)
@@ -103,6 +103,40 @@ def larcv_particle(p):
         larp.interaction_id(p.part.interaction_id)
     
     return larp
+
+def larcv_neutrino(n):
+    
+    larn = larcv.Neutrino()
+    
+        
+    larn.id                 (int(n.id)) 
+    larn.gen_id             (int(n.gen_id))
+    larn.nu_track_id        (int(n.nu_track_id))
+    larn.lepton_track_id    (int(n.lepton_track_id))
+    larn.current_type        (n.current_type)
+    larn.interaction_mode    (n.interaction_mode)
+    larn.interaction_type    (n.interaction_type)
+    larn.target              (n.target)   
+    larn.nucleon             (n.nucleon)
+    larn.quark               (n.quark)
+    larn.hadronic_invariant_mass(n.hadronic_invariant_mass)
+    larn.bjorken_x              (n.bjorken_x)
+    larn.inelasticity           (n.inelasticity)
+    larn.momentum_transfer      (n.momentum_transfer)
+    larn.momentum_transfer_mag  (n.momentum_transfer_mag)
+    larn.energy_transfer        (n.energy_transfer)
+    larn.theta               (n.theta)
+    larn.pdg_code            (n.pdg_code)
+    larn.lepton_pdg_code     (n.lepton_pdg_code)
+    larn.momentum            (n.px, n.py, n.pz)
+    larn.lepton_p            (n.lepton_p)
+    larn.distance_travel     (n.dist_travel)
+    larn.energy_init         (n.energy_init)
+    larn.energy_deposit      (n.energy_deposit)
+    larn.creation_process    (n.creation_process)
+    larn.num_voxels          (n.num_voxels)
+   
+    return larn
 
 def run_supera(out_file='larcv.root',
     in_files=[],
