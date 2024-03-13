@@ -352,7 +352,8 @@ namespace edep2supera {
 						supera_part.type = supera::kIonization;
 					}else if(std::abs(supera_part.parent_pdg) == 211 || 
 						std::abs(supera_part.parent_pdg) == 13 || 
-						std::abs(supera_part.parent_pdg) == 2212) {
+						std::abs(supera_part.parent_pdg) == 2212 ||
+						std::abs(supera_part.parent_pdg) == 321) {
 						supera_part.type = supera::kDelta;
 					}else{
 						LOG_WARNING() << "UNEXPECTED CASE for IONIZATION " << std::endl
@@ -367,7 +368,37 @@ namespace edep2supera {
 						//throw supera::meatloaf();
 						supera_part.type = supera::kIonization;
 					}
-				}else{
+				}
+				else if( g4type_sub == TG4TrajectoryPoint::G4ProcessSubtype::kSubtypeEMPairProdByCharged ) {
+					if(std::abs(supera_part.parent_pdg) == 13 || std::abs(supera_part.parent_pdg) == 211) {
+						supera_part.type = supera::kDelta;
+						LOG_WARNING() << "UNEXPECTED DELTA" << std::endl
+									  << "PDG " << pdg_code
+									  << " TrackId " << edepsim_part.TrackId
+									  << " Energy " << supera_part.energy_init
+									  << " Parent PDG " << supera_part.parent_pdg
+									  << " Parent TrackId " << edepsim_part.ParentId
+									  << " G4ProcessType " << g4type_main
+									  << " SubProcessType " << g4type_sub
+									  << std::endl;
+					}
+					else{
+						LOG_FATAL() << "UNEXPECTED EM PairProd Parent PDG" << std::endl
+									<< "PDG " << pdg_code
+									<< " TrackId " << edepsim_part.TrackId
+									<< " Energy " << supera_part.energy_init
+									<< " Parent PDG " << supera_part.parent_pdg
+									<< " Parent TrackId " << edepsim_part.ParentId
+									<< " G4ProcessType " << g4type_main
+									<< " SubProcessType " << g4type_sub
+									<< std::endl;
+						throw supera::meatloaf();
+					}
+				}
+				
+				
+				
+				else{
 					LOG_FATAL() << "UNEXPECTED EM SubType " << std::endl
 					<< "PDG " << pdg_code 
 					<< " TrackId " << edepsim_part.TrackId
