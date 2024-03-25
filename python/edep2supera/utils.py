@@ -194,7 +194,7 @@ def run_supera(out_file='larcv.root',
         result.FillTensorEnergy(id_v,value_v)
         larcv.as_event_sparse3d(tensor_energy,meta,id_v,value_v)
 
-        tensor_semantic = writer.get_data("sparse3d","pcluster_semantic")
+        tensor_semantic = writer.get_data("sparse3d","pcluster_semantics")
         result.FillTensorSemantic(id_v,value_v)
         larcv.as_event_sparse3d(tensor_semantic,meta,id_v,value_v)
 
