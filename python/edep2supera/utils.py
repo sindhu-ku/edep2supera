@@ -110,7 +110,7 @@ def larcv_neutrino(n):
     
         
     larn.id                 (int(n.id)) 
-    larn.gen_id             (int(n.gen_id))
+    larn.interaction_id     (int(n.interaction_id))
     larn.nu_track_id        (int(n.nu_track_id))
     larn.lepton_track_id    (int(n.lepton_track_id))
     larn.current_type        (n.current_type)
