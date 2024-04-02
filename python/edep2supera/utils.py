@@ -130,6 +130,7 @@ def larcv_neutrino(n):
     larn.lepton_pdg_code     (n.lepton_pdg_code)
     larn.momentum            (n.px, n.py, n.pz)
     larn.lepton_p            (n.lepton_p)
+    larn.position            (n.vtx.pos.x, n.vtx.pos.y, n.vtx.pos.z, n.vtx.time)
     larn.distance_travel     (n.dist_travel)
     larn.energy_init         (n.energy_init)
     larn.energy_deposit      (n.energy_deposit)
