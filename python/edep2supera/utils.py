@@ -60,8 +60,9 @@ def larcv_particle(p):
     
     # particle's info setter
     larp.track_id         (p.part.trackid)
-    if hasattr(p.part, "gen_id") and hasattr(larp, "gen_id"):
-        larp.gen_id(p.part.gen_id)
+    if hasattr(p.part, "genid") and hasattr(larp, "gen_id"):
+        larp.gen_id(p.part.genid)
+        print("genid", p.part.genid)
     larp.pdg_code         (p.part.pdg)
     larp.momentum         (p.part.px,p.part.py,p.part.pz)
     larp.end_momentum     (p.part.end_px,p.part.end_py,p.part.end_pz)
