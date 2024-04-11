@@ -140,6 +140,17 @@ def larcv_neutrino(n):
    
     return larn
 
+def larcv_flash(f):
+
+    larf=larcv.Flash()
+
+    larf.id              (int(f.id))
+    larf.time            (f.time)
+    larf.tpc             (f.tpc)
+    larf.PEPerOpDet      (f.PEPerOpDet)
+
+    return larf
+
 def run_supera(out_file='larcv.root',
     in_files=[],
     config_key='',
