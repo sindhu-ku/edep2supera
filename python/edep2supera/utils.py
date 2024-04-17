@@ -6,6 +6,7 @@ from ROOT import supera, TChain
 supera.EDep
 import numpy as np
 from larcv import larcv
+import cppyy
 
 def dict2map(target):
     result = ROOT.std.map("std::string,std::string")()
@@ -146,8 +147,13 @@ def larcv_flash(f):
 
     larf.id              (int(f.id))
     larf.time            (f.time)
+    larf.timeWidth       (f.timeWidth)
     larf.tpc             (f.tpc)
-    larf.PEPerOpDet      (f.PEPerOpDet)
+    pe_list = [] #direct conversion of vector doesn't seem to work
+    pe_vec = cppyy.gbl.std.vector('double')()
+    for pe in (f.PEPerOpDet):
+        pe_vec.push_back(pe)
+    larf.PEPerOpDet      (pe_vec)
 
     return larf
 
