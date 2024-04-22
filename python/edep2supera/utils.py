@@ -110,10 +110,10 @@ def larcv_neutrino(n):
     larn = larcv.Neutrino()
     
         
-    larn.id                 (int(n.id)) 
-    larn.interaction_id     (int(n.interaction_id))
-    larn.nu_track_id        (int(n.nu_track_id))
-    larn.lepton_track_id    (int(n.lepton_track_id))
+    larn.id                 (larcv.InstanceID_t(n.id)) 
+    larn.interaction_id     (larcv.InstanceID_t(n.interaction_id))
+    larn.nu_track_id        (supera.CUInt_t(n.nu_track_id))
+    larn.lepton_track_id    (supera.CUInt_t(n.lepton_track_id))
     larn.current_type        (n.current_type)
     larn.interaction_mode    (n.interaction_mode)
     larn.interaction_type    (n.interaction_type)
@@ -127,8 +127,8 @@ def larcv_neutrino(n):
     larn.momentum_transfer_mag  (n.momentum_transfer_mag)
     larn.energy_transfer        (n.energy_transfer)
     larn.theta               (n.theta)
-    larn.pdg_code            (n.pdg_code)
-    larn.lepton_pdg_code     (n.lepton_pdg_code)
+    larn.pdg_code            (int(n.pdg_code))
+    larn.lepton_pdg_code     (int(n.lepton_pdg_code))
     larn.momentum            (n.px, n.py, n.pz)
     larn.lepton_p            (n.lepton_p)
     larn.position            (n.vtx.pos.x, n.vtx.pos.y, n.vtx.pos.z, n.vtx.time)
@@ -136,7 +136,7 @@ def larcv_neutrino(n):
     larn.energy_init         (n.energy_init)
     larn.energy_deposit      (n.energy_deposit)
     larn.creation_process    (n.creation_process)
-    larn.num_voxels          (n.num_voxels)
+    larn.num_voxels          (int(n.num_voxels))
    
     return larn
 
