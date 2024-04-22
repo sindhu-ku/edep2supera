@@ -52,7 +52,9 @@ def larcv_meta(supera_meta):
     return larcv_meta
 
 def larcv_particle(p):
-        
+    
+    US2NS = 1.e3
+
     larp=larcv.Particle()
     
     larp.id              (p.part.id)
@@ -76,7 +78,7 @@ def larcv_particle(p):
                     ancestor_position = p.part.ancestor_vtx,
                    )
     for key,item in vtx_dict.items():
-        getattr(larp,key)(item.pos.x, item.pos.y, item.pos.z, item.time)
+        getattr(larp,key)(item.pos.x, item.pos.y, item.pos.z, item.time * US2NS)
     
     #larp.distance_travel ( double dist ) { _dist_travel = dist; }
     larp.energy_init      (p.part.energy_init)
@@ -131,7 +133,7 @@ def larcv_neutrino(n):
     larn.lepton_pdg_code     (int(n.lepton_pdg_code))
     larn.momentum            (n.px, n.py, n.pz)
     larn.lepton_p            (n.lepton_p)
-    larn.position            (n.vtx.pos.x, n.vtx.pos.y, n.vtx.pos.z, n.vtx.time)
+    larn.position            (n.vtx.pos.x, n.vtx.pos.y, n.vtx.pos.z, n.vtx.time * US2NS)
     larn.distance_travel     (n.dist_travel)
     larn.energy_init         (n.energy_init)
     larn.energy_deposit      (n.energy_deposit)
