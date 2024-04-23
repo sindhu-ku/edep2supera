@@ -110,7 +110,7 @@ def larcv_particle(p):
 def larcv_neutrino(n):
     
     larn = larcv.Neutrino()
-    
+    US2NS = 1.e3
         
     larn.id                 (larcv.InstanceID_t(n.id)) 
     larn.interaction_id     (larcv.InstanceID_t(n.interaction_id))
