@@ -16,7 +16,7 @@ setup(
         '-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.9',
     ],
     author=['Kazuhiro Terao, Zach Hulcher'],
-    author_email='kterao@slac.stanford.edu, zhulchero@slac.stanford.edu',
+    author_email='kterao@slac.stanford.edu, zhulcher@slac.stanford.edu',
     description='Supera interface for EDepSim input data files',
     license='MIT',
     keywords='supera edep-sim larcv larcv3 neutrinos deep learning lartpc_mlreco3d',
