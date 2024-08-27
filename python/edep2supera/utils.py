@@ -6,6 +6,7 @@ from ROOT import supera, TChain
 supera.EDep
 import numpy as np
 from larcv import larcv
+import cppyy
 
 def dict2map(target):
     result = ROOT.std.map("std::string,std::string")()
@@ -141,6 +142,21 @@ def larcv_neutrino(n):
     larn.num_voxels          (int(n.num_voxels))
    
     return larn
+
+def larcv_flash(f):
+
+    larf=larcv.Flash()
+
+    larf.id              (int(f.id))
+    larf.time            (f.time)
+    larf.timeWidth       (f.timeWidth)
+    larf.tpc             (f.tpc)
+    pe_vec = cppyy.gbl.std.vector('double')() #direct conversion of vector doesn't seem to work
+    for pe in (f.PEPerOpDet):
+        pe_vec.push_back(pe)
+    larf.PEPerOpDet      (pe_vec)
+
+    return larf
 
 def run_supera(out_file='larcv.root',
     in_files=[],
